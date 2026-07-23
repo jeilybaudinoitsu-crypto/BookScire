@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Scire - Estudiantil</title>
+    <link rel="stylesheet" href="style.css"> <!-- enlace de firebase -->
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        darkBg: '#0f172a',
+                        darkCard: '#1e293b',
+                        primary: '#3b82f6',
+                        primaryHover: '#2563eb',
+                        textMain: '#f8fafc',
+                        textMuted: '#94a3b8',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Fuente Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Iconos Phosphor -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <!-- Estilos personalizados -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-darkBg text-textMain min-h-screen flex flex-col selection:bg-primary selection:text-white">
+
+    <!-- Header / Navbar -->
+    <header class="sticky top-0 z-40 bg-darkCard/90 backdrop-blur-md border-b border-slate-700">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <!-- Logo -->
+            <div class="flex items-center gap-2 cursor-pointer" onclick="renderHome()">
+                <div class="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-white font-bold text-xl">
+                    <i class="ph ph-books"></i>
+                </div>
+                <span class="text-xl font-bold tracking-tight">Book<span class="text-primary">Scire</span></span>
+            </div>
+
+            <!-- Botón Publicar (Desktop) -->
+            <div class="hidden sm:block">
+                <button onclick="openPublishModal()" class="bg-primary hover:bg-primaryHover text-white px-4 py-2 rounded-full font-medium transition-colors flex items-center gap-2 shadow-lg shadow-primary/20">
+                    <i class="ph ph-plus-circle text-lg"></i>
+                    Publicar Artículo
+                </button>
+            </div>
+            
+            <!-- Botón Menú (Mobile) -->
+            <div class="sm:hidden flex items-center gap-4">
+                <button onclick="openPublishModal()" class="bg-primary hover:bg-primaryHover text-white p-2 rounded-full transition-colors">
+                    <i class="ph ph-plus text-xl"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Contenido Principal -->
+    <main class="flex-grow max-w-6xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 flex flex-col md:flex-row gap-8">
+        
+        <!-- Sidebar: Filtros (Categories) -->
+        <aside class="w-full md:w-64 flex-shrink-0">
+            <div class="bg-darkCard rounded-2xl p-5 border border-slate-700 sticky top-24">
+                <h3 class="text-lg font-semibold mb-4 flex items-center gap-2 border-b border-slate-700 pb-2">
+                    <i class="ph ph-funnel text-primary"></i>
+                    Materias / Categorías
+                </h3>
+                
+                <div class="space-y-1 mt-2" id="categories-container">
+                    <!-- Skeletons de carga -->
+                    <div class="animate-pulse flex space-x-4 py-2">
+                        <div class="h-4 bg-slate-700 rounded w-3/4"></div>
+                    </div>
+                    <div class="animate-pulse flex space-x-4 py-2">
+                        <div class="h-4 bg-slate-700 rounded w-1/2"></div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Área Central: Lista de Productos -->
+        <section class="flex-grow">
+            <!-- Barra superior: Búsqueda y Título -->
+            <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
+                <h2 class="text-2xl font-bold" id="current-category-title">Todos los Artículos</h2>
+                
+                <div class="relative w-full sm:w-72">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="ph ph-magnifying-glass text-textMuted"></i>
+                    </div>
+                    <input type="text" id="search-input" placeholder="Buscar por título..." 
+                           class="block w-full pl-10 pr-3 py-2 border border-slate-600 rounded-full leading-5 bg-slate-800 text-textMain placeholder-textMuted focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary sm:text-sm transition-colors">
+                </div>
+            </div>
+
+            <!-- Grid de Productos -->
+            <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Skeletons de carga -->
+                <div class="bg-darkCard rounded-2xl p-4 border border-slate-700 animate-pulse">
+                    <div class="w-full h-40 bg-slate-700 rounded-xl mb-4"></div>
+                    <div class="h-5 bg-slate-700 rounded w-3/4 mb-2"></div>
+                    <div class="h-4 bg-slate-700 rounded w-1/2 mb-4"></div>
+                    <div class="flex justify-between items-center">
+                        <div class="h-6 bg-slate-700 rounded w-1/4"></div>
+                        <div class="h-8 bg-slate-700 rounded-full w-24"></div>
+                    </div>
+                </div>
+                <div class="bg-darkCard rounded-2xl p-4 border border-slate-700 animate-pulse hidden sm:block">
+                    <div class="w-full h-40 bg-slate-700 rounded-xl mb-4"></div>
+                    <div class="h-5 bg-slate-700 rounded w-3/4 mb-2"></div>
+                    <div class="h-4 bg-slate-700 rounded w-1/2 mb-4"></div>
+                    <div class="flex justify-between items-center">
+                        <div class="h-6 bg-slate-700 rounded w-1/4"></div>
+                        <div class="h-8 bg-slate-700 rounded-full w-24"></div>
+                    </div>
+                </div>
+                <div class="bg-darkCard rounded-2xl p-4 border border-slate-700 animate-pulse hidden lg:block">
+                    <div class="w-full h-40 bg-slate-700 rounded-xl mb-4"></div>
+                    <div class="h-5 bg-slate-700 rounded w-3/4 mb-2"></div>
+                    <div class="h-4 bg-slate-700 rounded w-1/2 mb-4"></div>
+                    <div class="flex justify-between items-center">
+                        <div class="h-6 bg-slate-700 rounded w-1/4"></div>
+                        <div class="h-8 bg-slate-700 rounded-full w-24"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Mensaje de estado vacío -->
+            <div id="empty-state" class="hidden flex-col items-center justify-center py-20 text-center">
+                <i class="ph ph-package text-6xl text-slate-600 mb-4"></i>
+                <h3 class="text-xl font-medium text-slate-300">No se encontraron artículos</h3>
+                <p class="text-textMuted mt-2 max-w-md">Intenta buscar con otros términos o selecciona una categoría diferente.</p>
+                <button onclick="clearFilters()" class="mt-4 text-primary hover:text-primaryHover font-medium underline">
+                    Limpiar filtros
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-darkCard border-t border-slate-800 py-6 mt-auto">
+        <div class="max-w-6xl mx-auto px-4 text-center text-textMuted text-sm">
+            <p>&copy; 2026 Book Scire. Proyecto Estudiantil.</p>
+        </div>
+    </footer>
+
+    <!-- Modal: Publicar Artículo -->
+    <div id="publish-modal" class="fixed inset-0 z-50 flex items-center justify-center hidden">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closePublishModal()"></div>
+        <div class="relative bg-darkCard border border-slate-700 rounded-2xl w-full max-w-md mx-4 overflow-hidden shadow-2xl modal-enter" id="publish-modal-content">
+            
+            <div class="flex justify-between items-center p-5 border-b border-slate-700">
+                <h2 class="text-xl font-bold">Publicar Artículo</h2>
+                <button onclick="closePublishModal()" class="text-textMuted hover:text-white transition-colors">
+                    <i class="ph ph-x text-2xl"></i>
+                </button>
+            </div>
+            
+            <form id="publish-form" class="p-5 space-y-4">
+                <!-- Tipo -->
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-1">Tipo de Artículo</label>
+                    <div class="flex gap-4">
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="type" value="Libro" checked class="text-primary bg-slate-800 border-slate-600 focus:ring-primary focus:ring-offset-slate-900">
+                            <span>Libro</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="type" value="Apunte" class="text-primary bg-slate-800 border-slate-600 focus:ring-primary focus:ring-offset-slate-900">
+                            <span>Apunte/Guía</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Título -->
+                <div>
+                    <label for="p-title" class="block text-sm font-medium text-slate-300 mb-1">Título</label>
+                    <input type="text" id="p-title" required placeholder="Ej. Álgebra Lineal 3ra Edición" 
+                           class="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary">
+                </div>
+
+                <!-- Categoría / Materia -->
+                <div>
+                    <label for="p-category" class="block text-sm font-medium text-slate-300 mb-1">Materia / Carrera</label>
+                    <select id="p-category" required class="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary">
+                        <option value="" disabled selected>Selecciona una materia...</option>
+                    </select>
+                </div>
+
+                <!-- Precio -->
+                <div>
+                    <label for="p-price" class="block text-sm font-medium text-slate-300 mb-1">Precio (USD)</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <span class="text-slate-400">$</span>
+                        </div>
+                        <input type="number" id="p-price" min="0" step="0.5" placeholder="0 para gratis" required
+                               class="w-full pl-8 pr-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary">
+                    </div>
+                    <p class="text-xs text-slate-400 mt-1">Coloca 0 si es regalado.</p>
+                </div>
+                
+                <!-- URL Imagen -->
+                <div>
+                    <label for="p-image" class="block text-sm font-medium text-slate-300 mb-1">URL de Foto (Opcional)</label>
+                    <input type="url" id="p-image" placeholder="https://ejemplo.com/foto.jpg" 
+                           class="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary">
+                    <p class="text-xs text-slate-400 mt-1">Se usará una por defecto si está vacío.</p>
+                </div>
+
+                <!-- WhatsApp del vendedor -->
+                <div>
+                    <label for="p-phone" class="block text-sm font-medium text-slate-300 mb-1">Tu número de WhatsApp</label>
+                    <div class="flex">
+                        <span class="inline-flex items-center px-3 rounded-l-lg border border-r-0 border-slate-600 bg-slate-700 text-slate-300 text-sm">
+                            +
+                        </span>
+                        <input type="tel" id="p-phone" required placeholder="Ej. 584121234567" pattern="[0-9]+"
+                               class="flex-1 w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-r-lg text-white placeholder-slate-500 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary">
+                    </div>
+                </div>
+
+                <div class="pt-4 border-t border-slate-700">
+                    <button type="submit" class="w-full bg-primary hover:bg-primaryHover text-white font-medium py-2 px-4 rounded-lg transition-colors flex justify-center items-center gap-2">
+                        <i class="ph ph-upload-simple"></i>
+                        Publicar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-4 right-4 bg-slate-800 border border-slate-700 text-white px-4 py-3 rounded-xl shadow-lg transform transition-all duration-300 translate-y-20 opacity-0 z-50 flex items-center gap-3">
+        <i id="toast-icon" class="ph ph-check-circle text-green-400 text-xl"></i>
+        <span id="toast-message" class="text-sm font-medium">Acción exitosa</span>
+    </div>
+
+    <!-- Scripts -->
+    <script src="data.js"></script>
+    <script src="app.js"></script>
+    <script type="module" src="app.js"></script> <!--firebase-->
+</body>
+</html>
