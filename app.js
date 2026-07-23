@@ -1,32 +1,9 @@
-// Import the functions you need from the SDKs you need
-//firebase
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyA2399huLPWcqEsZNJtfR_D4Mh4RImMQN4",
-  authDomain: "bookscire.firebaseapp.com",
-  projectId: "bookscire",
-  storageBucket: "bookscire.firebasestorage.app",
-  messagingSenderId: "891645413609",
-  appId: "1:891645413609:web:40daaba270e889048e0878",
-  measurementId: "G-B1LFPCRFYX"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-//firebase 
 // ==========================================
 // LÓGICA DE UI Y RENDERIZADO
 // ==========================================
 
 document.addEventListener('DOMContentLoaded', () => {
+    initModalElements();
     renderCategories();
     renderCategorySelectOptions();
     renderProducts();
@@ -167,10 +144,22 @@ function renderProducts() {
 // MANEJO DE MODALES Y FORMULARIO
 // ==========================================
 
-const modal = document.getElementById('publish-modal');
-const modalContent = document.getElementById('publish-modal-content');
+let modal = null;
+let modalContent = null;
+
+function initModalElements() {
+    modal = document.getElementById('publish-modal');
+    modalContent = document.getElementById('publish-modal-content');
+    console.log('Modal elements:', { modal, modalContent });
+}
 
 function openPublishModal() {
+    console.log('openPublishModal called');
+    initModalElements();
+    if (!modal || !modalContent) {
+        console.error('Modal elements not found');
+        return;
+    }
     modal.classList.remove('hidden');
     // Trigger reflow for animation
     void modal.offsetWidth;
@@ -184,6 +173,10 @@ function openPublishModal() {
 }
 
 function closePublishModal() {
+    console.log('closePublishModal called');
+    initModalElements();
+    if (!modal || !modalContent) return;
+    
     modalContent.classList.remove('modal-enter-active');
     modalContent.classList.add('modal-exit-active');
     
@@ -193,6 +186,12 @@ function closePublishModal() {
         document.getElementById('publish-form').reset();
     }, 200);
 }
+
+// Exponer globalmente para onclick inline
+window.openPublishModal = openPublishModal;
+window.closePublishModal = closePublishModal;
+window.clearFilters = clearFilters;
+window.renderHome = renderHome;
 
 function handlePublish(e) {
     e.preventDefault();
@@ -268,3 +267,9 @@ function showToast(message, type = 'success') {
 function renderHome() {
     clearFilters();
 }
+
+// Exponer globalmente para onclick inline
+window.openPublishModal = openPublishModal;
+window.closePublishModal = closePublishModal;
+window.clearFilters = clearFilters;
+window.renderHome = renderHome;
